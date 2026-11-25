@@ -1,0 +1,566 @@
+<Window x:Class="CyberMonitor.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:CyberMonitor.Controls"
+        Title="CyberMonitor Overlay"
+        Width="300" Height="175"
+        Left="-20000" Top="-20000"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ShowActivated="False" Focusable="False"
+        ResizeMode="NoResize" IsHitTestVisible="False"
+        UseLayoutRounding="True"
+        FontFamily="Bahnschrift, Segoe UI"
+        TextOptions.TextFormattingMode="Ideal">
+
+    <Window.Resources>
+        <Color x:Key="CyanColor">#00F0FF</Color>
+        <Color x:Key="MagentaColor">#FF2A6D</Color>
+        <Color x:Key="YellowColor">#FCEE0A</Color>
+
+        <SolidColorBrush x:Key="Cyan" Color="{StaticResource CyanColor}" />
+        <SolidColorBrush x:Key="Magenta" Color="{StaticResource MagentaColor}" />
+        <SolidColorBrush x:Key="Yellow" Color="{StaticResource YellowColor}" />
+        <Color x:Key="LimeColor">#7CFF4F</Color>
+        <SolidColorBrush x:Key="Lime" Color="{StaticResource LimeColor}" />
+        <DropShadowEffect x:Key="LimeGlow" x:Shared="False" Color="{StaticResource LimeColor}" BlurRadius="16" ShadowDepth="0" Opacity="0.8" />
+        <SolidColorBrush x:Key="Ink" Color="#0B0614" />
+        <SolidColorBrush x:Key="Dim" Color="#7C88AC" />
+        <SolidColorBrush x:Key="Bright" Color="#EEF1FF" />
+        <SolidColorBrush x:Key="PanelBg" Color="#E8090512" />
+
+        <DropShadowEffect x:Key="CyanGlow" x:Shared="False" Color="{StaticResource CyanColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.9" />
+        <DropShadowEffect x:Key="MagentaGlow" x:Shared="False" Color="{StaticResource MagentaColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.9" />
+        <DropShadowEffect x:Key="YellowGlow" x:Shared="False" Color="{StaticResource YellowColor}" BlurRadius="18" ShadowDepth="0" Opacity="0.85" />
+
+        <!-- CRT-Scanlines -->
+        <DrawingBrush x:Key="ScanlineBrush" TileMode="Tile" Stretch="None"
+                      Viewport="0,0,4,3" ViewportUnits="Absolute"
+                      Viewbox="0,0,4,3" ViewboxUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <GeometryDrawing Brush="#59000000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,4,1" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
+        <Style x:Key="Lbl" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Foreground" Value="{StaticResource Dim}" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+        </Style>
+
+        <Style x:Key="Val" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Bright}" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Text" Value="--" />
+        </Style>
+
+        <!-- HUD-Sektion: Kopf-Tag mit angeschrägter Kante + Akzentlinie -->
+        <Style x:Key="HudSection" TargetType="HeaderedContentControl">
+            <Setter Property="Margin" Value="0,12,0,0" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="HeaderedContentControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Background="{TemplateBinding BorderBrush}" Height="18" Padding="8,0,3,0">
+                                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center"
+                                                          TextElement.Foreground="#0B0614"
+                                                          TextElement.FontWeight="Bold"
+                                                          TextElement.FontSize="11.5" />
+                                    </Border>
+                                    <Polygon Points="0,0 10,0 0,18" Fill="{TemplateBinding BorderBrush}" />
+                                </StackPanel>
+                                <Rectangle Grid.Column="1" Height="1" VerticalAlignment="Bottom" Margin="4,0,8,0"
+                                           Fill="{TemplateBinding BorderBrush}" Opacity="0.45" />
+                                <TextBlock Grid.Column="2" VerticalAlignment="Bottom" FontFamily="Consolas" FontSize="10"
+                                           Foreground="{TemplateBinding BorderBrush}" Opacity="0.8"
+                                           MaxWidth="250" TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            </Grid>
+                            <Border Grid.Row="1" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,0,0"
+                                    Background="#0CFFFFFF" Padding="12,9,8,9">
+                                <ContentPresenter />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Eck-Griffe im Bearbeiten-Modus -->
+        <Style x:Key="Grip" TargetType="Grid">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Background" Value="#01000000" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        </Style>
+        <Style x:Key="GripFill" TargetType="Path">
+            <Setter Property="Data" Value="M 30,4 L 30,30 L 4,30 Z" />
+            <Setter Property="Fill" Value="{StaticResource Yellow}" />
+        </Style>
+        <Style x:Key="GripLines" TargetType="Path">
+            <Setter Property="Data" Value="M 12,26 L 26,12 M 19,26 L 26,19" />
+            <Setter Property="Stroke" Value="{StaticResource Ink}" />
+            <Setter Property="StrokeThickness" Value="1.6" />
+        </Style>
+
+        <!-- Mini-Ansicht -->
+        <Style x:Key="MiniCard" TargetType="Border">
+            <Setter Property="Width" Value="262" />
+            <Setter Property="BorderThickness" Value="2,0,0,0" />
+            <Setter Property="Background" Value="#0CFFFFFF" />
+            <Setter Property="Padding" Value="8,3,8,3" />
+            <Setter Property="Margin" Value="3" />
+        </Style>
+        <Style x:Key="MiniLbl" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="MiniVal" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource Bright}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="MiniSub" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{StaticResource Bright}" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Text" Value="--" />
+        </Style>
+
+        <!-- Kanten-Griffe im Bearbeiten-Modus -->
+        <Style x:Key="EdgeH" TargetType="Grid">
+            <Setter Property="Height" Value="12" />
+            <Setter Property="Margin" Value="34,0" />
+            <Setter Property="Background" Value="#01000000" />
+            <Setter Property="Cursor" Value="SizeNS" />
+        </Style>
+        <Style x:Key="EdgeV" TargetType="Grid">
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Margin" Value="0,34" />
+            <Setter Property="Background" Value="#01000000" />
+            <Setter Property="Cursor" Value="SizeWE" />
+        </Style>
+        <Style x:Key="EdgeBarH" TargetType="Rectangle">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="4" />
+            <Setter Property="Fill" Value="{StaticResource Yellow}" />
+        </Style>
+        <Style x:Key="EdgeBarV" TargetType="Rectangle">
+            <Setter Property="Width" Value="4" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Fill" Value="{StaticResource Yellow}" />
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="WindowRoot">
+
+    <!-- Das Panel füllt das ganze Fenster (Breite/Höhe frei einstellbar). -->
+    <Grid x:Name="Root" Margin="8" Opacity="0" RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <ScaleTransform x:Name="RootScale" ScaleX="1.08" ScaleY="0.02" />
+        </Grid.RenderTransform>
+
+        <!-- Rahmen (Geometrie wird im Code an die Größe angepasst) -->
+        <Path x:Name="FrameGlow" Stroke="{StaticResource Cyan}" StrokeThickness="2" Opacity="0.55"
+              Effect="{StaticResource CyanGlow}" />
+        <Path x:Name="FramePath" Fill="{StaticResource PanelBg}" Stroke="{StaticResource Cyan}" StrokeThickness="1.2" />
+        <Path x:Name="AccentPath" Stroke="{StaticResource Magenta}" StrokeThickness="2.5"
+              StrokeEndLineCap="Square" StrokeStartLineCap="Square" />
+
+        <!-- Inhalt wird gleichmäßig in das Rechteck eingepasst. Welche Ansicht, Detailstufe und Spaltenzahl
+             am besten passt, entscheidet OverlayWindow.ChooseLayout(). -->
+        <Viewbox x:Name="ContentBox" Stretch="Uniform" Margin="12,10,12,10">
+        <Grid>
+
+        <!-- ================================================================ Volle Ansicht -->
+        <StackPanel x:Name="FullView">
+
+            <StackPanel x:Name="FullHeader">
+                <Grid>
+                    <Grid x:Name="TitleGroup" HorizontalAlignment="Left">
+                        <TextBlock Text="CYBER//MONITOR" FontSize="23" FontWeight="Bold" Foreground="{StaticResource Magenta}" Opacity="0.85">
+                            <TextBlock.RenderTransform><TranslateTransform x:Name="GlitchA" /></TextBlock.RenderTransform>
+                        </TextBlock>
+                        <TextBlock Text="CYBER//MONITOR" FontSize="23" FontWeight="Bold" Foreground="{StaticResource Cyan}" Opacity="0.85">
+                            <TextBlock.RenderTransform><TranslateTransform x:Name="GlitchB" /></TextBlock.RenderTransform>
+                        </TextBlock>
+                        <TextBlock Text="CYBER//MONITOR" FontSize="23" FontWeight="Bold" Foreground="{StaticResource Bright}" />
+                    </Grid>
+                    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Ellipse x:Name="LiveDot" Width="7" Height="7" Fill="{StaticResource Magenta}" Margin="0,0,5,0"
+                                     VerticalAlignment="Center" Effect="{StaticResource MagentaGlow}" />
+                            <TextBlock Text="LIVE" FontFamily="Consolas" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource Magenta}" />
+                        </StackPanel>
+                        <TextBlock x:Name="ClockText" Text="00:00:00" FontFamily="Consolas" FontSize="12"
+                                   Foreground="{StaticResource Cyan}" HorizontalAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock x:Name="TargetText" Margin="0,4,0,0" FontFamily="Consolas" FontSize="11"
+                           Foreground="{StaticResource Cyan}" TextTrimming="CharacterEllipsis" Text="&gt; TARGET :: --" />
+                <TextBlock x:Name="StatusText" FontFamily="Consolas" FontSize="10.5"
+                           Foreground="{StaticResource Dim}" TextTrimming="CharacterEllipsis" Text="&gt; SYNC SENSOR BUS ..." />
+
+                <Rectangle Height="1" Margin="0,8,0,0">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#FF00F0FF" Offset="0" />
+                            <GradientStop Color="#99FF2A6D" Offset="0.6" />
+                            <GradientStop Color="#00FF2A6D" Offset="1" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+            </StackPanel>
+
+            <!-- Sektionen: 1, 2 oder 3 Spalten (im Code gesetzt) -->
+            <Grid x:Name="SectionsGrid">
+
+            <!-- ===== FPS ===== -->
+            <HeaderedContentControl Style="{StaticResource HudSection}" Header="FPS // RENDER"
+                                    BorderBrush="{StaticResource Yellow}" x:Name="FpsSection" Tag="DXGI · D3D9">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <TextBlock x:Name="FpsText" Text="---" FontSize="56" FontWeight="Bold"
+                                   Foreground="{StaticResource Yellow}" Effect="{StaticResource YellowGlow}"
+                                   Margin="0,-10,0,-8" />
+                        <TextBlock Text="FPS" FontSize="13" FontWeight="Bold" Foreground="{StaticResource Yellow}"
+                                   Opacity="0.75" VerticalAlignment="Bottom" Margin="5,0,0,6" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="FRAMETIME" />
+                            <TextBlock x:Name="FrametimeText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="1% LOW" />
+                            <TextBlock x:Name="LowText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="API" />
+                            <TextBlock x:Name="ApiText" Style="{StaticResource Val}" FontSize="12" Foreground="{StaticResource Yellow}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <c:Sparkline x:Name="FpsSpark" Grid.Row="1" Grid.ColumnSpan="2" Height="44" Margin="0,10,0,0"
+                                 Accent="{StaticResource YellowColor}" AutoScale="True" Unit=" fps" />
+                </Grid>
+            </HeaderedContentControl>
+
+            <!-- ===== CPU ===== -->
+            <HeaderedContentControl Style="{StaticResource HudSection}" Header="CPU // CORE"
+                                    BorderBrush="{StaticResource Cyan}" x:Name="CpuSection" Tag="--">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="118" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Width="114" Height="114" HorizontalAlignment="Left">
+                        <c:ArcGauge x:Name="CpuGauge" Accent="{StaticResource CyanColor}" Effect="{StaticResource CyanGlow}" />
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,4,0,0">
+                            <TextBlock x:Name="CpuLoadText" Text="--" FontSize="28" FontWeight="Bold"
+                                       Foreground="{StaticResource Bright}" HorizontalAlignment="Center" />
+                            <TextBlock Text="% LOAD" FontFamily="Consolas" FontSize="9.5" Foreground="{StaticResource Cyan}"
+                                       HorizontalAlignment="Center" Margin="0,-3,0,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Grid.Column="1" Margin="12,2,0,0">
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="TEMP" />
+                            <TextBlock x:Name="CpuTempText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <c:SegmentBar x:Name="CpuTempBar" Height="7" Margin="0,2,0,6" Maximum="100" />
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="CLOCK Ø" />
+                            <TextBlock x:Name="CpuClockText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="CLOCK PEAK" />
+                            <TextBlock x:Name="CpuPeakText" Style="{StaticResource Val}" FontSize="12" Foreground="{StaticResource Cyan}" />
+                        </Grid>
+                        <c:Sparkline x:Name="CpuSpark" Height="30" Margin="0,6,0,0" Accent="{StaticResource CyanColor}" Maximum="100" />
+                    </StackPanel>
+
+                    <c:CoreBars x:Name="CpuCores" Grid.Row="1" Grid.ColumnSpan="2" Height="26" Margin="0,8,0,0"
+                                Accent="{StaticResource CyanColor}" />
+                </Grid>
+            </HeaderedContentControl>
+
+            <!-- ===== GPU ===== -->
+            <HeaderedContentControl Style="{StaticResource HudSection}" Header="GPU // RENDER CORE"
+                                    BorderBrush="{StaticResource Magenta}" x:Name="GpuSection" Tag="--">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="118" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Width="114" Height="114" HorizontalAlignment="Left">
+                        <c:ArcGauge x:Name="GpuGauge" Accent="{StaticResource MagentaColor}" Effect="{StaticResource MagentaGlow}" />
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,4,0,0">
+                            <TextBlock x:Name="GpuLoadText" Text="--" FontSize="28" FontWeight="Bold"
+                                       Foreground="{StaticResource Bright}" HorizontalAlignment="Center" />
+                            <TextBlock Text="% LOAD" FontFamily="Consolas" FontSize="9.5" Foreground="{StaticResource Magenta}"
+                                       HorizontalAlignment="Center" Margin="0,-3,0,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Grid.Column="1" Margin="12,2,0,0">
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="TEMP" />
+                            <TextBlock x:Name="GpuTempText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <c:SegmentBar x:Name="GpuTempBar" Height="7" Margin="0,2,0,6" Maximum="100" />
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="CORE CLK" />
+                            <TextBlock x:Name="GpuClockText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="MEM CLK" />
+                            <TextBlock x:Name="GpuMemText" Style="{StaticResource Val}" FontSize="12" Foreground="{StaticResource Magenta}" />
+                        </Grid>
+                        <c:Sparkline x:Name="GpuSpark" Height="30" Margin="0,6,0,0" Accent="{StaticResource MagentaColor}" Maximum="100" />
+                    </StackPanel>
+                </Grid>
+            </HeaderedContentControl>
+
+            <!-- ===== Stromverbrauch ===== -->
+            <HeaderedContentControl Style="{StaticResource HudSection}" Header="PWR // DRAW"
+                                    BorderBrush="{StaticResource Lime}" x:Name="PowerSection" Tag="CPU + GPU">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="TotalPowerText" Text="---" FontSize="44" FontWeight="Bold"
+                                   Foreground="{StaticResource Lime}" Effect="{StaticResource LimeGlow}"
+                                   Margin="0,-8,0,-6" />
+                        <TextBlock Text="W" FontSize="13" FontWeight="Bold" Foreground="{StaticResource Lime}"
+                                   Opacity="0.75" VerticalAlignment="Bottom" Margin="5,0,0,5" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="CPU PACKAGE" />
+                            <TextBlock x:Name="CpuPowerText" Style="{StaticResource Val}" />
+                        </Grid>
+                        <Grid>
+                            <TextBlock Style="{StaticResource Lbl}" Text="GPU BOARD" />
+                            <TextBlock x:Name="GpuPowerText" Style="{StaticResource Val}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <c:Sparkline x:Name="PowerSpark" Grid.Row="1" Grid.ColumnSpan="2" Height="30" Margin="0,8,0,0"
+                                 Accent="{StaticResource LimeColor}" AutoScale="True" Unit=" W" />
+                </Grid>
+            </HeaderedContentControl>
+
+            </Grid>
+
+            <!-- ===== Fußzeile ===== -->
+            <Grid x:Name="FullFooter" Margin="0,12,0,0">
+                <TextBlock FontFamily="Consolas" FontSize="10" Foreground="{StaticResource Dim}">
+                    <Run Text="[" /><Run Text="STRG+Ö" Foreground="{StaticResource Yellow}" /><Run Text="] HIDE  [" /><Run Text="STRG+SHIFT+Ö" Foreground="{StaticResource Yellow}" /><Run Text="] EDIT" />
+                </TextBlock>
+                <TextBlock x:Name="HexText" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="10"
+                           Foreground="{StaticResource Magenta}" Opacity="0.8" Text="0x000000 // LINK" />
+            </Grid>
+        </StackPanel>
+
+        <!-- ================================================================ Mini-Ansicht (kleine Rechtecke) -->
+        <StackPanel x:Name="MiniView" Visibility="Collapsed">
+            <Grid x:Name="MiniHeader" Margin="3,0,3,2">
+                <TextBlock Text="CYBER//MONITOR" FontSize="13" FontWeight="Bold" Foreground="{StaticResource Magenta}" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse x:Name="MiniLiveDot" Width="6" Height="6" Fill="{StaticResource Magenta}" Margin="0,0,5,0"
+                             VerticalAlignment="Center" />
+                    <TextBlock x:Name="MiniClockText" Text="00:00:00" FontFamily="Consolas" FontSize="11"
+                               Foreground="{StaticResource Cyan}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- 1 Spalte = untereinander, 3 Spalten = Leiste (im Code gesetzt) -->
+            <UniformGrid x:Name="MiniGrid" Columns="1">
+                <Border x:Name="MiniFpsCard" Style="{StaticResource MiniCard}" BorderBrush="{StaticResource Yellow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="86" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="FPS" Style="{StaticResource MiniLbl}" Foreground="{StaticResource Yellow}" />
+                        <TextBlock x:Name="MiniFpsText" Grid.Column="1" Text="---" Style="{StaticResource MiniVal}"
+                                   Foreground="{StaticResource Yellow}" />
+                        <StackPanel x:Name="MiniFpsSub" Grid.Column="2" VerticalAlignment="Center">
+                            <TextBlock x:Name="MiniFrametimeText" Style="{StaticResource MiniSub}" />
+                            <TextBlock x:Name="MiniLowText" Style="{StaticResource MiniSub}" Foreground="{StaticResource Dim}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border x:Name="MiniCpuCard" Style="{StaticResource MiniCard}" BorderBrush="{StaticResource Cyan}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="86" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="CPU" Style="{StaticResource MiniLbl}" Foreground="{StaticResource Cyan}" />
+                        <TextBlock x:Name="MiniCpuLoadText" Grid.Column="1" Text="--" Style="{StaticResource MiniVal}" />
+                        <StackPanel x:Name="MiniCpuSub" Grid.Column="2" VerticalAlignment="Center">
+                            <TextBlock x:Name="MiniCpuTempText" Style="{StaticResource MiniSub}" />
+                            <TextBlock x:Name="MiniCpuClockText" Style="{StaticResource MiniSub}" Foreground="{StaticResource Dim}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border x:Name="MiniGpuCard" Style="{StaticResource MiniCard}" BorderBrush="{StaticResource Magenta}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="86" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="GPU" Style="{StaticResource MiniLbl}" Foreground="{StaticResource Magenta}" />
+                        <TextBlock x:Name="MiniGpuLoadText" Grid.Column="1" Text="--" Style="{StaticResource MiniVal}" />
+                        <StackPanel x:Name="MiniGpuSub" Grid.Column="2" VerticalAlignment="Center">
+                            <TextBlock x:Name="MiniGpuTempText" Style="{StaticResource MiniSub}" />
+                            <TextBlock x:Name="MiniGpuClockText" Style="{StaticResource MiniSub}" Foreground="{StaticResource Dim}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border x:Name="MiniPwrCard" Style="{StaticResource MiniCard}" BorderBrush="{StaticResource Lime}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="86" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="PWR" Style="{StaticResource MiniLbl}" Foreground="{StaticResource Lime}" />
+                        <TextBlock x:Name="MiniTotalPowerText" Grid.Column="1" Text="--" Style="{StaticResource MiniVal}"
+                                   Foreground="{StaticResource Lime}" />
+                        <StackPanel x:Name="MiniPwrSub" Grid.Column="2" VerticalAlignment="Center">
+                            <TextBlock x:Name="MiniCpuPowerText" Style="{StaticResource MiniSub}" />
+                            <TextBlock x:Name="MiniGpuPowerText" Style="{StaticResource MiniSub}" Foreground="{StaticResource Dim}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </UniformGrid>
+        </StackPanel>
+
+        </Grid>
+        </Viewbox>
+
+        <!-- Effekt-Ebene (wird auf die Rahmenform zugeschnitten) -->
+        <Grid x:Name="FxLayer" IsHitTestVisible="False">
+            <Rectangle Fill="{StaticResource ScanlineBrush}" Opacity="0.55" />
+            <Rectangle x:Name="ScanBar" Height="70" VerticalAlignment="Top">
+                <Rectangle.RenderTransform>
+                    <TranslateTransform x:Name="ScanBarShift" Y="-90" />
+                </Rectangle.RenderTransform>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#0000F0FF" Offset="0" />
+                        <GradientStop Color="#1A00F0FF" Offset="0.85" />
+                        <GradientStop Color="#5500F0FF" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Grid>
+    </Grid>
+
+    <!-- ================================================================ Bearbeiten-Modus (Strg+Shift+Ö / Tray)
+         Fläche ziehen = verschieben, Ecken und Kanten ziehen = Breite/Höhe, Mausrad = beides. -->
+    <Grid x:Name="EditLayer" Visibility="Collapsed">
+        <Rectangle Margin="4" Fill="#E0050210" Stroke="{StaticResource Yellow}" StrokeThickness="1.5" StrokeDashArray="4 3" />
+
+        <Viewbox StretchDirection="DownOnly" Margin="34">
+            <StackPanel>
+                <TextBlock Text="// EDIT MODE" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource Yellow}"
+                           HorizontalAlignment="Center" />
+                <TextBlock x:Name="EditSizeText" Text="300 × 175" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Bright}"
+                           HorizontalAlignment="Center" />
+                <TextBlock FontFamily="Consolas" FontSize="10.5" Foreground="{StaticResource Bright}" TextAlignment="Center"
+                           TextWrapping="Wrap" Width="230" Margin="0,2,0,8"
+                           Text="Fläche ziehen = verschieben&#x0a;Ecken / Kanten ziehen = Größe" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <!-- Auswahlmenü: welche Werte angezeigt werden -->
+                    <Border x:Name="MetricsButton" Background="{StaticResource Cyan}" Padding="14,4" Margin="0,0,8,0" Cursor="Hand">
+                        <TextBlock Text="WERTE ▾" FontWeight="Bold" FontSize="13" Foreground="{StaticResource Ink}" />
+                    </Border>
+                    <Border x:Name="DoneButton" Background="{StaticResource Yellow}" Padding="18,4" Cursor="Hand">
+                        <TextBlock Text="FERTIG" FontWeight="Bold" FontSize="13" Foreground="{StaticResource Ink}" />
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Viewbox>
+
+        <!-- Kanten: nur Breite bzw. nur Höhe. Tag = "sx,sy" (+1 = rechts/unten, -1 = links/oben, 0 = unverändert) -->
+        <Grid x:Name="EdgeT" Tag="0,-1" Style="{StaticResource EdgeH}" VerticalAlignment="Top"><Rectangle Style="{StaticResource EdgeBarH}" /></Grid>
+        <Grid x:Name="EdgeB" Tag="0,1" Style="{StaticResource EdgeH}" VerticalAlignment="Bottom"><Rectangle Style="{StaticResource EdgeBarH}" /></Grid>
+        <Grid x:Name="EdgeL" Tag="-1,0" Style="{StaticResource EdgeV}" HorizontalAlignment="Left"><Rectangle Style="{StaticResource EdgeBarV}" /></Grid>
+        <Grid x:Name="EdgeR" Tag="1,0" Style="{StaticResource EdgeV}" HorizontalAlignment="Right"><Rectangle Style="{StaticResource EdgeBarV}" /></Grid>
+
+        <!-- Ecken: Breite und Höhe. Gezeichnet als Dreieck unten rechts, per ScaleTransform gespiegelt. -->
+        <Grid x:Name="GripTL" Tag="-1,-1" Style="{StaticResource Grip}" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE">
+            <Grid.RenderTransform><ScaleTransform ScaleX="-1" ScaleY="-1" /></Grid.RenderTransform>
+            <Path Style="{StaticResource GripFill}" /><Path Style="{StaticResource GripLines}" />
+        </Grid>
+        <Grid x:Name="GripTR" Tag="1,-1" Style="{StaticResource Grip}" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW">
+            <Grid.RenderTransform><ScaleTransform ScaleX="1" ScaleY="-1" /></Grid.RenderTransform>
+            <Path Style="{StaticResource GripFill}" /><Path Style="{StaticResource GripLines}" />
+        </Grid>
+        <Grid x:Name="GripBL" Tag="-1,1" Style="{StaticResource Grip}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW">
+            <Grid.RenderTransform><ScaleTransform ScaleX="-1" ScaleY="1" /></Grid.RenderTransform>
+            <Path Style="{StaticResource GripFill}" /><Path Style="{StaticResource GripLines}" />
+        </Grid>
+        <Grid x:Name="GripBR" Tag="1,1" Style="{StaticResource Grip}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE">
+            <Path Style="{StaticResource GripFill}" /><Path Style="{StaticResource GripLines}" />
+        </Grid>
+    </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>CyberMonitor</AssemblyName>
+    <RootNamespace>CyberMonitor</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Version>1.0.0</Version>
+
+    <!-- Schlanker Laufzeit-Footprint: keine zusätzlichen GC-Hintergrundthreads -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
+
+    <!-- WFAC010: WinForms möchte DPI per API statt im Manifest. Das Fenster ist aber WPF, dort ist das Manifest richtig
+         (PerMonitorV2); WinForms wird nur fürs Tray-Icon benutzt. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Sensoren: CPU/GPU Last, Temperatur, Takt -->
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.*" />
+    <!-- FPS: Present-Events per ETW (gleiches Prinzip wie PresentMon) -->
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Deinstallations-Kit: landet neben der EXE (bin\ und publish\) -->
+    <None Update="Uninstall.ps1;Uninstall.bat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- Nur zum Anschauen im Browser, gehört nicht ins Programm -->
+    <None Update="Vorschau.html" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+</Project>
