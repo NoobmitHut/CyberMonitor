@@ -1,186 +1,218 @@
-# CYBER//MONITOR
+<h1 align="center">CYBER//MONITOR</h1>
 
-Hardware-Overlay für Windows 10/11 im Cyberpunk-Look.
-Mit **Strg + Ö** legst du es über jede Anwendung, ohne dass es den Fokus nimmt oder Klicks abfängt.
+<p align="center">
+  <b>Hardware-Overlay für Windows 10/11 im Cyberpunk-Look</b><br>
+  FPS, CPU, GPU und Stromverbrauch über jedem Spiel, per <b>Strg + Ö</b> ein- und ausblendbar.
+</p>
 
-## Was angezeigt wird
+<p align="center">
+  <a href="https://github.com/NoobmitHut/CyberMonitor/releases/latest"><img alt="Neueste Version" src="https://img.shields.io/github/v/release/NoobmitHut/CyberMonitor?label=Version&color=00f0ff&labelColor=0b0614"></a>
+  <a href="https://github.com/NoobmitHut/CyberMonitor/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/NoobmitHut/CyberMonitor/total?label=Downloads&color=ff2a6d&labelColor=0b0614"></a>
+  <img alt="Windows 10/11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-fcee0a?labelColor=0b0614">
+</p>
 
-| Bereich | Werte | Darstellung |
+<p align="center">
+  <img src="docs/screenshots/breit.png" alt="CyberMonitor, volle Ansicht mit FPS, CPU, GPU und Stromverbrauch (Beispielwerte)" width="800">
+</p>
+
+---
+
+## ⬇ Download
+
+<p align="center">
+  <a href="https://github.com/NoobmitHut/CyberMonitor/releases/latest/download/CyberMonitor-win-x64.zip"><b>CyberMonitor herunterladen (Windows, 64 Bit)</b></a>
+</p>
+
+| Datei | Für wen | Größe |
 |---|---|---|
-| **FPS** | FPS, Frametime, 1 % Low, Grafik-API | große Neon-Zahl, Verlaufsdiagramm (30 s) |
-| **CPU** | Auslastung, Temperatur, Ø-Takt, höchster Kerntakt, Last pro Thread | 270°-Ring, LED-Temperaturbalken, Verlaufsdiagramm, Kern-Matrix |
-| **GPU** | Auslastung, Temperatur, Kerntakt, Speichertakt | 270°-Ring, LED-Temperaturbalken, Verlaufsdiagramm |
-| **Strom** | Summe CPU + GPU, CPU-Paket, Grafikkarte (Watt) | große Neon-Zahl, Verlaufsdiagramm |
+| [**CyberMonitor-win-x64.zip**](https://github.com/NoobmitHut/CyberMonitor/releases/latest/download/CyberMonitor-win-x64.zip) | **Empfohlen.** Läuft sofort, nichts weiter zu installieren | ca. 75 MB |
+| [CyberMonitor-win-x64-net8.zip](https://github.com/NoobmitHut/CyberMonitor/releases/latest/download/CyberMonitor-win-x64-net8.zip) | Klein, braucht die [.NET 8 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet/8.0) | ca. 5 MB |
 
-Animationen: Einschalten im CRT-Stil mit Flackern, Glitch-Titel, Scanlines, Scan-Balken, blinkende LIVE-Anzeige
-und weich animierte Ringe und Balken. Temperaturen werden ab 70 °C gelb und ab 85 °C rot.
+Alle Versionen und Änderungen: [Releases](https://github.com/NoobmitHut/CyberMonitor/releases)
 
-## Vorschau
+## 🚀 Schnellstart
 
-`Vorschau.html` im Browser öffnen. Dort ist das Overlay mit simulierten Werten über einer Spielszene
-nachgebaut. Strg+Ö funktioniert auch dort. Die Datei ist nur zum Anschauen und gehört nicht zum Programm.
+1. **ZIP herunterladen und entpacken**, den Ordner `CyberMonitor` an einen festen Ort legen, z. B. `C:\Tools\CyberMonitor`.
+   (Nicht im Download-Ordner lassen, der Autostart merkt sich den Pfad.)
+2. **`CyberMonitor.exe` starten.**
+   - Zeigt Windows „Der Computer wurde durch Windows geschützt“: **Weitere Informationen → Trotzdem ausführen**.
+     Das Programm ist nicht kostenpflichtig signiert, deshalb kennt SmartScreen es noch nicht.
+   - Die **Admin-Abfrage (UAC) bestätigen**. Admin-Rechte braucht CyberMonitor für die Hardware-Sensoren und die FPS-Messung.
+3. CyberMonitor sitzt jetzt unten rechts im **Tray**. **Strg + Ö** blendet das Overlay ein und aus.
+4. **Für CPU-Temperatur und CPU-Leistung** einmal den Treiber [**PawnIO**](https://pawnio.eu) installieren
+   (oder in PowerShell: `winget install namazso.PawnIO`) und CyberMonitor neu starten.
+   Ohne PawnIO steht im Overlay „PAWNIO FEHLT“; alles andere funktioniert trotzdem.
 
-## Bauen (einmalig, unter Windows)
+Beim ersten Start richtet CyberMonitor den **Autostart** ein. Danach startet es bei jeder Anmeldung ohne Admin-Abfrage
+im Tray. Abschalten: Rechtsklick aufs Tray-Icon → „Mit Windows starten“.
 
-1. [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) installieren
-2. `build.bat` doppelklicken
-3. Den Ordner `publish\` an einen festen Ort kopieren, z. B. `C:\Tools\CyberMonitor\`
-4. `CyberMonitor.exe` starten und die UAC-Abfrage bestätigen
+## 🖥 Ansichten
 
-Beim ersten Start legt das Programm den **Autostart** an. Danach startet es bei jeder Windows-Anmeldung
-ohne UAC-Abfrage im Tray.
+Das Overlay ist ein frei veränderbares Rechteck, Standard ist **klein oben links**. Der Inhalt passt sich der Form an.
 
-## Bedienung
+| Klein (Standard) | Bearbeiten-Modus (Strg + Shift + Ö) |
+|---|---|
+| <img src="docs/screenshots/mini.png" alt="Mini-Ansicht" width="300"> | <img src="docs/screenshots/bearbeiten.png" alt="Bearbeiten-Modus mit Griffen" width="300"> |
 
-- **Strg + Ö**: Overlay ein- oder ausblenden
-- **Linksklick aufs Tray-Icon**: dasselbe
-- **Rechtsklick aufs Tray-Icon**: Verschieben/Größe, angezeigte Werte, Autostart an/aus, Position, Overlay-Größe, Deinstallieren, Beenden
-- **Strg + Shift + Ö**: Bearbeiten-Modus, um das Overlay mit der Maus zu verschieben und Breite/Höhe zu ändern (siehe unten).
-  Funktioniert immer und blendet das Overlay bei Bedarf ein.
-- **Strg + Shift + Plus / Minus** (Haupttastatur oder Nummernblock): Breite und Höhe gemeinsam um 10 % ändern.
-  Diese Tasten sind nur belegt, solange das Overlay sichtbar ist.
+**Flach und breit: Leiste**
 
-### Größe und Position
+<img src="docs/screenshots/leiste.png" alt="Mini-Ansicht als Leiste" width="800">
 
-Standard ist ein **kleines Rechteck oben links** (300 × 175).
-
-**Mit der Maus:** **Strg + Shift + Ö** drücken (oder Tray → „Verschieben / Größe ändern“). Das Overlay bekommt einen
-gelben Rahmen mit Griffen:
-
-- **Fläche ziehen**: verschieben
-- **Ecken ziehen**: Breite und Höhe ändern, die gegenüberliegende Ecke bleibt stehen
-- **Kanten ziehen** (gelbe Striche in der Mitte jeder Seite): nur die Breite oder nur die Höhe ändern
-- **Mausrad**: beides gemeinsam ändern
-- **WERTE ▾** klicken: Auswahlmenü, in dem man jeden Wert einzeln ein- oder ausblendet
-- **FERTIG** klicken oder Strg + Shift + Ö erneut drücken
-
-In diesem Modus nimmt das Overlay Mausklicks an, bekommt aber nie den Tastaturfokus. Das Spiel behält also die Tastatur.
-Danach lässt das Overlay Klicks wieder durch. Größe und Position werden gespeichert. Die Position merkt sich das
-Overlay als „nächste Bildschirmecke + Abstand“. Beim Vergrößern bleibt es deshalb in seiner Ecke stehen.
-
-**Der Inhalt passt sich dem Rechteck an:**
+<details>
+<summary><b>Groß, hochkant: volle Ansicht</b> (aufklappen)</summary>
+<br>
+<img src="docs/screenshots/voll.png" alt="Volle Ansicht hochkant" width="400">
+</details>
 
 | Rechteck | Ansicht |
 |---|---|
-| klein (Standard) | Mini-Ansicht: FPS, CPU, GPU als Zeilen mit Frametime, Temperatur und Takt |
-| flach und breit | Mini-Ansicht als Leiste nebeneinander |
+| klein | Mini-Ansicht: FPS, CPU, GPU, Strom als Zeilen mit Frametime, Temperatur, Takt |
+| flach und breit | Mini-Ansicht als Leiste |
 | schmal und hoch | Mini-Ansicht nur mit den Hauptwerten |
 | groß, hochkant | volle Ansicht mit Ringen, Verlaufsgrafiken und Kern-Matrix |
-| groß, quer | volle Ansicht in 2 oder 3 Spalten |
+| groß, quer | volle Ansicht in 2 bis 4 Spalten |
 
-Ist das Rechteck für die volle Ansicht etwas zu klein, fallen zuerst die Verlaufsgrafiken weg.
+*Die Bilder zeigen Beispielwerte.*
 
-Im Tray-Menü unter **Overlay-Größe** gibt es feste Größen (Klein, Mittel, Groß, Breit, Leiste). Unter
-**Overlay-Position** setzt man das Overlay in eine der vier Ecken zurück. Die Werte stehen auch in
-`%APPDATA%\CyberMonitor\settings.json` (`OverlayWidth`, `OverlayHeight`, `Position`, `OffsetX`, `OffsetY`).
+## 🎮 Bedienung
 
-### Angezeigte Werte
-
-Welche Werte das Overlay zeigt, stellt man im Bearbeiten-Modus über **WERTE ▾** ein, oder im Tray unter
-**Angezeigte Werte**. Das Menü bleibt beim Anklicken offen, so kann man mehrere Werte nacheinander umschalten.
-
-| Gruppe | Werte |
+| Taste / Klick | Wirkung |
 |---|---|
-| FPS | FPS, Frametime, 1 % Low, Grafik-API |
-| CPU | Auslastung, Temperatur, Takt, Last pro Kern (Matrix) |
-| GPU | Auslastung, Temperatur, Takt, Speichertakt |
-| Stromverbrauch | Summe CPU + GPU, CPU-Leistung, GPU-Leistung |
-| Allgemein | Verlaufsgrafiken, Titelzeile und Uhr, Ziel und Status |
+| **Strg + Ö** | Overlay ein-/ausblenden |
+| **Strg + Shift + Ö** | Bearbeiten-Modus ein/aus (blendet das Overlay bei Bedarf ein) |
+| **Strg + Shift + Plus / Minus** | Overlay um 10 % größer/kleiner (nur solange es sichtbar ist) |
+| Linksklick aufs Tray-Icon | Overlay ein-/ausblenden |
+| Rechtsklick aufs Tray-Icon | Verschieben/Größe, angezeigte Werte, Position, feste Größen, Autostart, Deinstallieren, Beenden |
 
-Sind alle Werte eines Bereichs aus, verschwindet der ganze Bereich (bzw. die Karte in der Mini-Ansicht), und der
-übrige Inhalt bekommt mehr Platz. Mindestens ein Messwert bleibt immer sichtbar.
+**Im Bearbeiten-Modus** bekommt das Overlay einen gelben Rahmen:
 
-### Stromverbrauch
+- **Fläche ziehen**: verschieben
+- **Ecken ziehen**: Breite und Höhe ändern, die gegenüberliegende Ecke bleibt stehen
+- **Kanten ziehen** (gelbe Striche): nur Breite oder nur Höhe
+- **Mausrad**: beides gemeinsam
+- **WERTE ▾**: Auswahlmenü, um jeden Wert einzeln ein- oder auszublenden
+- **FERTIG** oder erneut Strg + Shift + Ö: fertig, Klicks gehen wieder durch
 
-Angezeigt wird die Leistungsaufnahme des **CPU-Pakets** und der **Grafikkarte** in Watt sowie deren **Summe**.
-Das ist der größte Teil des Verbrauchs, aber **nicht der Wert an der Steckdose**: Mainboard, RAM, Laufwerke, Lüfter
-und die Verluste des Netzteils fehlen. Den echten Gesamtverbrauch kann Software nur mit einem Netzteil auslesen, das
-seine Werte meldet (z. B. Corsair iCUE-Netzteile), oder mit einem Strommessgerät.
+Das Overlay nimmt nie den Tastaturfokus, das Spiel behält also immer die Tastatur. Größe, Position und Auswahl werden
+gespeichert.
 
-Das Overlay erscheint auf dem Monitor der gerade aktiven Anwendung. Die FPS werden immer für das
-Programm im Vordergrund gemessen, der Prozessname steht als `TARGET` oben im Overlay.
+## 📊 Was angezeigt wird
 
-## Ressourcenverbrauch
-
-| Zustand | Was läuft |
+| Bereich | Werte |
 |---|---|
-| **Ausgeblendet** | Kein Sensor-Polling, keine ETW-Session, keine Timer, keine Animationen. Der Hardware-Treiber ist geschlossen. Windows weckt den Prozess nur, wenn du den Hotkey drückst. Zusätzlich ist der Windows-**Effizienzmodus** (EcoQoS) aktiv und der Arbeitsspeicher wird freigegeben. Die CPU-Last liegt bei 0 %. |
-| **Eingeblendet** | Sensoren 1× pro Sekunde, FPS 2× pro Sekunde, Animationen auf 30 fps begrenzt, Mess-Threads mit niedriger Priorität |
+| **FPS** | FPS, Frametime, 1 % Low, Grafik-API, Verlauf |
+| **CPU** | Auslastung, Temperatur, Ø-Takt, höchster Kerntakt, Last pro Thread |
+| **GPU** | Auslastung, Temperatur, Kerntakt, Speichertakt |
+| **Strom** | Summe CPU + GPU, CPU-Paket, Grafikkarte (Watt) |
 
-Das Ein- und Ausschalten mit Strg+Ö öffnet und schließt die Sensoren jedes Mal komplett. Deshalb dauert es
-nach dem Einblenden etwa eine Sekunde, bis die ersten Werte da sind (`SYNC SENSOR BUS ...`).
+Temperaturen werden ab 70 °C gelb und ab 85 °C rot. Die FPS gelten immer für das Programm im Vordergrund
+(steht als `TARGET` im Overlay). Der Stromwert ist CPU + Grafikkarte, **nicht** der Verbrauch an der Steckdose
+(Mainboard, RAM, Laufwerke, Lüfter und Netzteilverluste fehlen).
 
-## Technik
+## ❓ Fragen und Probleme
 
-- **WPF / .NET 8**, ein transparentes Fenster, das immer im Vordergrund liegt (`WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW`).
-  Es lässt Klicks durch, nimmt nie den Fokus und erscheint nicht in Alt+Tab.
-- **Hotkey** über `RegisterHotKey`. Windows fängt Strg+Ö ab, deshalb kommt die Kombination im Spiel nicht an.
-- **Sensoren** über [LibreHardwareMonitorLib](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (NVIDIA, AMD, Intel)
-- **FPS** über ETW-Present-Events (DXGI und D3D9), dasselbe Verfahren wie Microsofts PresentMon.
-  Es wird nichts in das Spiel injiziert, deshalb gibt es keine Probleme mit Anti-Cheat.
-  Gezählt wird nur die aktivste Swapchain des Spiels (Launcher- oder UI-Fenster desselben Prozesses fallen raus),
-  reine Test-Presents (`DXGI_PRESENT_TEST`) werden ignoriert. Bei Store-/UWP-Spielen wird der eigentliche
-  Spielprozess hinter `ApplicationFrameHost.exe` gemessen. **1 % Low** ist das 99. Perzentil der Frametimes
-  der letzten 5 Sekunden.
-- **Autostart** über die Windows-Aufgabenplanung („bei Anmeldung, mit höchsten Rechten“). Ein normaler
-  Registry-Run-Eintrag funktioniert bei Programmen mit Admin-Rechten nicht.
+<details>
+<summary><b>CPU-Temperatur zeigt „PAWNIO FEHLT“</b></summary>
 
-## Bekannte Einschränkungen
+CPU-Temperatur und -Leistung braucht der Treiber [PawnIO](https://pawnio.eu). Einmal installieren
+(`winget install namazso.PawnIO` oder Installer von der Webseite), dann CyberMonitor neu starten.
+Den CPU-Takt liest CyberMonitor ohne Treiber über die Windows-Leistungszähler (wie der Task-Manager).
+</details>
 
-- **Exklusiver Vollbildmodus:** Kein Overlay-Fenster (auch nicht Discord oder Steam ohne Hook) kann darüber
-  gezeichnet werden. Im Spiel **„Randloses Fenster“ / „Borderless“** wählen. Unter Windows 10/11 klappt es dank
-  „Vollbildoptimierungen“ aber meistens auch im Vollbild.
-- **FPS bei Vulkan/OpenGL:** Die werden nur erfasst, wenn der Treiber über DXGI präsentiert. Bei NVIDIA:
-  Systemsteuerung → *Vulkan/OpenGL-Present-Methode* → „Auf DXGI-Swapchain bevorzugen“.
-  DirectX 9/10/11/12 funktioniert direkt.
-- **CPU-Temperatur zeigt „PAWNIO FEHLT“:** Die verwendete LibreHardwareMonitor-Version (0.9.6) liest CPU-Temperatur,
-  -Takt und -Leistung über den Kernel-Treiber [PawnIO](https://pawnio.eu). Einmal installieren (Installer von der
-  Webseite oder `winget install namazso.PawnIO`), danach CyberMonitor neu starten. Ohne den Treiber nimmt CyberMonitor
-  den **CPU-Takt aus den Windows-Leistungszählern** (wie der Task-Manager: Basistakt × „% Processor Performance“).
-  Temperatur und CPU-Leistung lassen sich ohne Treiber nicht zuverlässig lesen. Das Overlay sagt das dann ausdrücklich
-  (Temperaturfeld, Statuszeile, einmaliger Tray-Hinweis) und zeigt nicht nur `--`.
-- Wenn Strg+Ö schon von einem anderen Programm belegt ist, meldet das Tray-Icon das. Das Overlay lässt sich
-  dann per Klick aufs Icon öffnen.
+<details>
+<summary><b>FPS zeigt 0 oder das Overlay ist im Spiel nicht zu sehen</b></summary>
 
-## Deinstallation
+- Im Spiel **„Randloses Fenster“ / „Borderless“** wählen. Über *exklusives* Vollbild kann kein Overlay-Fenster zeichnen
+  (auch Discord oder Steam nicht ohne Hook).
+- **Vulkan/OpenGL**: Die FPS werden nur erfasst, wenn der Treiber über DXGI präsentiert. Bei NVIDIA:
+  Systemsteuerung → *Vulkan/OpenGL-Present-Methode* → „Auf DXGI-Swapchain bevorzugen“. DirectX 9 bis 12 geht direkt.
+- Das Spiel muss das **aktive Fenster** sein (siehe `TARGET` im Overlay).
+</details>
 
-Es gibt zwei Wege, beide räumen dasselbe auf:
+<details>
+<summary><b>Windows/Virenscanner warnt vor der Datei</b></summary>
 
-- **Tray-Menü → „Deinstallieren ...“** und bestätigen. CyberMonitor beendet sich, danach läuft das Skript.
-- **`Uninstall.bat`** im Programmordner doppelklicken (fragt nach Admin-Rechten). Das klappt auch, wenn
-  CyberMonitor gar nicht mehr startet.
+CyberMonitor ist nicht kostenpflichtig signiert, deshalb warnt SmartScreen beim ersten Start
+(„Weitere Informationen → Trotzdem ausführen“). Manche Virenscanner reagieren auf Programme, die Hardware-Sensoren
+und Admin-Rechte nutzen. Der komplette Quellcode liegt hier im Repository; die Release-Dateien baut GitHub Actions
+direkt daraus, die SHA-256-Prüfsummen stehen beim Release.
+</details>
 
-Entfernt werden:
+<details>
+<summary><b>Strg + Ö funktioniert nicht</b></summary>
 
-1. laufende CyberMonitor-Prozesse
-2. die Autostart-Aufgabe `CyberMonitor` in der Aufgabenplanung
-3. eine nach einem Absturz evtl. übrig gebliebene ETW-Session `CyberMonitor-FPS`
-4. ein übrig gebliebener Sensor-Treiberdienst, aber nur wenn er eindeutig zu CyberMonitor gehört
-   (gemeinsam genutzte Treiber wie PawnIO bleiben)
-5. Einstellungen und Logs in `%APPDATA%\CyberMonitor\`
-6. der Programmordner selbst. Zur Sicherheit nur, wenn darin `CyberMonitor.exe` liegt und es kein
-   Quellcode-Ordner, kein Laufwerk und kein Ordner wie Desktop oder Downloads ist.
+Dann benutzt schon ein anderes Programm die Tastenkombination; das Tray-Icon meldet das beim Start.
+Das Overlay lässt sich dann per Linksklick aufs Tray-Icon öffnen.
+</details>
 
-Optionen für die Kommandozeile: `Uninstall.bat -Yes` (ohne Rückfrage), `-KeepSettings` (Einstellungen behalten),
-`-KeepFiles` (Programmordner behalten).
+<details>
+<summary><b>Kostet das Leistung im Spiel?</b></summary>
 
-Von Hand geht es so (als Admin):
+Ausgeblendet praktisch nichts: keine Sensorabfrage, keine FPS-Messung, keine Animationen, Windows-Effizienzmodus aktiv,
+0 % CPU. Eingeblendet: Sensoren 1× pro Sekunde, FPS 2× pro Sekunde, Animationen auf 30 fps begrenzt, niedrige
+Thread-Priorität. In das Spiel wird nichts injiziert, deshalb gibt es auch keine Probleme mit Anti-Cheat.
+</details>
+
+## 🗑 Deinstallation
+
+- **Rechtsklick aufs Tray-Icon → „Deinstallieren ...“**, oder
+- **`Uninstall.bat`** im Programmordner doppelklicken (geht auch, wenn CyberMonitor nicht mehr startet).
+
+Entfernt werden: laufende Prozesse, die Autostart-Aufgabe, Einstellungen und Logs (`%APPDATA%\CyberMonitor`)
+und der Programmordner. Gemeinsam genutzte Treiber wie PawnIO bleiben installiert.
+Optionen: `Uninstall.bat -Yes` (ohne Rückfrage), `-KeepSettings`, `-KeepFiles`.
+
+<details>
+<summary>Von Hand (als Admin)</summary>
 
 ```bat
 schtasks /Delete /TN CyberMonitor /F
 logman stop CyberMonitor-FPS -ets
 rmdir /s /q "%APPDATA%\CyberMonitor"
 ```
+</details>
 
-## Projektstruktur
+## 🛠 Technik
+
+- **WPF / .NET 8**, ein transparentes, immer obenliegendes Fenster (`WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW`):
+  lässt Klicks durch, nimmt nie den Fokus, erscheint nicht in Alt+Tab.
+- **Sensoren** über [LibreHardwareMonitorLib](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (NVIDIA, AMD, Intel),
+  CPU-Takt-Ersatz über die Windows-Leistungszähler.
+- **FPS** über ETW-Present-Events (DXGI und D3D9), wie Microsofts PresentMon. Gezählt wird nur die aktivste Swapchain,
+  Test-Presents werden ignoriert, Store-/UWP-Spiele werden hinter `ApplicationFrameHost.exe` erkannt.
+  **1 % Low** = 99. Perzentil der Frametimes der letzten 5 Sekunden.
+- **Hotkeys** über `RegisterHotKey`, **Autostart** über die Aufgabenplanung („bei Anmeldung, mit höchsten Rechten“).
+- Einstellungen in `%APPDATA%\CyberMonitor\settings.json` (Größe, Position, angezeigte Werte).
+
+## 🔧 Selbst bauen
+
+1. [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) installieren
+2. Repository herunterladen (grüner Knopf **Code → Download ZIP**) und `build.bat` doppelklicken
+3. Das Ergebnis liegt in `publish\`
+
+Releases baut [GitHub Actions](.github/workflows/release.yml) automatisch, sobald ein Tag `v*` hochgeladen wird.
+`Vorschau.html` zeigt das Overlay mit simulierten Werten im Browser (nur zum Anschauen).
+
+<details>
+<summary>Projektstruktur</summary>
 
 ```
-CyberMonitor/
-├─ App.xaml(.cs)            Start, Tray, Hotkey, Ruhemodus
-├─ OverlayWindow.xaml(.cs)  Cyberpunk-UI, Animationen, Positionierung
+├─ App.xaml(.cs)            Start, Tray, Hotkeys, Ruhemodus
+├─ OverlayWindow.xaml(.cs)  Overlay-UI, Layout-Auswahl, Bearbeiten-Modus
 ├─ Native.cs                Win32-Interop
-├─ Uninstall.ps1 / .bat     Deinstallations-Kit (wird neben die EXE kopiert)
+├─ Uninstall.ps1 / .bat     Deinstallations-Kit (liegt neben der EXE)
 ├─ Controls/                ArcGauge, Sparkline, SegmentBar, CoreBars
-└─ Services/                HardwareService, FpsService, HotkeyManager,
-                            AutostartManager, TrayIcon, AppSettings, Metrics, CpuPerfClock, Uninstaller
+├─ Services/                HardwareService, CpuPerfClock, FpsService, HotkeyManager,
+│                           AutostartManager, TrayIcon, AppSettings, Metrics, Uninstaller
+├─ docs/screenshots/        Bilder für diese Seite
+└─ .github/                 Release-Workflow und Release-Text
 ```
+</details>
+
+## 📄 Rechtliches
+
+© NoobmitHut. Alle Rechte vorbehalten. Du darfst CyberMonitor herunterladen und privat nutzen.
+Den Quellcode weiterzuverwenden, zu verändern oder weiterzugeben ist ohne Erlaubnis nicht gestattet.
+
+CyberMonitor enthält Bibliotheken anderer Projekte unter deren eigenen Lizenzen (u. a. LibreHardwareMonitor, MPL-2.0),
+siehe [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

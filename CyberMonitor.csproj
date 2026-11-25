@@ -13,7 +13,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PlatformTarget>x64</PlatformTarget>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <Version>1.0.0</Version>
+    <!-- Wird beim Release-Build aus dem Git-Tag gesetzt (v1.2.3 → 1.2.3) -->
+    <Version>1.0.1</Version>
 
     <!-- Schlanker Laufzeit-Footprint: keine zusätzlichen GC-Hintergrundthreads -->
     <ServerGarbageCollection>false</ServerGarbageCollection>
@@ -26,15 +27,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Sensoren: CPU/GPU Last, Temperatur, Takt -->
-    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.*" />
+    <!-- Feste Versionen: Release-Builds sollen genau das enthalten, was getestet wurde (siehe THIRD-PARTY-NOTICES.md) -->
+    <!-- Sensoren: CPU/GPU Last, Temperatur, Takt, Leistung (braucht für CPU-Werte den Treiber PawnIO) -->
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
     <!-- FPS: Present-Events per ETW (gleiches Prinzip wie PresentMon) -->
-    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.*" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.30" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Deinstallations-Kit: landet neben der EXE (bin\ und publish\) -->
-    <None Update="Uninstall.ps1;Uninstall.bat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- Deinstallations-Kit, Anleitung und Lizenzhinweise: landen neben der EXE (bin\ und publish\) -->
+    <None Update="Uninstall.ps1;Uninstall.bat;README.md;THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- Nur zum Anschauen im Browser, gehört nicht ins Programm -->
     <None Update="Vorschau.html" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
   </ItemGroup>

@@ -1,0 +1,78 @@
+# Baut CyberMonitor und veröffentlicht ein GitHub-Release, sobald ein Tag wie v1.2.3 hochgeladen wird.
+# Ergebnis: zwei ZIPs mit festen Namen (damit .../releases/latest/download/<Name> immer funktioniert) + SHA256SUMS.txt.
+#
+#   git tag v1.0.1
+#   git push origin v1.0.1
+#
+# Ein vorhandenes Release lässt sich über "Actions → Release → Run workflow" neu bauen.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Vorhandener Tag, z. B. v1.0.1'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Bauen
+        shell: pwsh
+        run: |
+          $version = $env:TAG.TrimStart('v')
+
+          # Eigenständig: enthält die .NET-Laufzeit, läuft ohne weitere Installation
+          dotnet publish CyberMonitor.csproj -c Release -r win-x64 --self-contained true `
+            -p:PublishReadyToRun=true -p:Version=$version -o out/full/CyberMonitor
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+          # Klein: braucht die .NET 8 Desktop Runtime
+          dotnet publish CyberMonitor.csproj -c Release -r win-x64 --self-contained false `
+            -p:Version=$version -o out/small/CyberMonitor
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+          # tar schreibt ZIP-Pfade mit "/" (normgerecht, funktioniert in allen Entpackern)
+          Push-Location out/full;  tar -a -c -f ../../CyberMonitor-win-x64.zip CyberMonitor;      Pop-Location
+          Push-Location out/small; tar -a -c -f ../../CyberMonitor-win-x64-net8.zip CyberMonitor; Pop-Location
+
+          $sums = Get-ChildItem CyberMonitor-*.zip | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name
+          }
+          $sums | Set-Content SHA256SUMS.txt -Encoding ascii
+          $sums
+          Get-ChildItem CyberMonitor-*.zip | ForEach-Object { "{0}: {1:N1} MB" -f $_.Name, ($_.Length / 1MB) }
+
+      - name: Release veröffentlichen
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view $env:TAG *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $env:TAG --title "CyberMonitor $env:TAG" --notes-file .github/release-body.md --latest
+          } else {
+            gh release edit $env:TAG --title "CyberMonitor $env:TAG" --notes-file .github/release-body.md
+          }
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          gh release upload $env:TAG CyberMonitor-win-x64.zip CyberMonitor-win-x64-net8.zip SHA256SUMS.txt --clobber
